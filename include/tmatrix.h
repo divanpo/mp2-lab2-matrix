@@ -37,18 +37,42 @@ public:
   }
   TDynamicVector(const TDynamicVector& v)
   {
+      sz = v.sz;
+      pMem = new T[sz];
+      for (int i = 0; i < sz; i++)
+          pMem[i] = v.pMem[i];
   }
   TDynamicVector(TDynamicVector&& v) noexcept
   {
+      sz = v.sz;
+      pMem = v.pMem;
+
+      v.pMem = nullptr;
+      v.sz = 0;
   }
   ~TDynamicVector()
   {
+      delete[] pMem;
   }
   TDynamicVector& operator=(const TDynamicVector& v)
   {
+      if (pMem != nullptr)
+          delete[] pMem;
+      sz = v.sz;
+      pMem = new T[sz];
+      for (int i = 0; i < sz; i++)
+          pMem[i] = v.pMem[i];
+      return *this;
   }
   TDynamicVector& operator=(TDynamicVector&& v) noexcept
   {
+      if (pMem != nullptr)
+          delete[] pMem;
+      sz = v.sz;
+      pMem = v.pMem;
+      v.sz = 0;
+      v.pMem = nullptr;
+      return *this;
   }
 
   size_t size() const noexcept { return sz; }
@@ -56,9 +80,11 @@ public:
   // индексация
   T& operator[](size_t ind)
   {
+      return pMem[ind];
   }
   const T& operator[](size_t ind) const
   {
+      return pMem[ind];
   }
   // индексация с контролем
   T& at(size_t ind)
@@ -71,31 +97,72 @@ public:
   // сравнение
   bool operator==(const TDynamicVector& v) const noexcept
   {
+      if (sz != v.sz)
+          throw sz - v.sz;
+      for (int i = 0; i < sz; i++) {
+        if (pMem[i] != v.pMem[i])
+            return false;
+      }
+      return true;
   }
   bool operator!=(const TDynamicVector& v) const noexcept
   {
+      return not(*this == v);
   }
 
   // скалярные операции
   TDynamicVector operator+(T val)
   {
+      TDynamicVector tmp(*this);
+      for (int i = 0; i < sz; i++)
+          pMem[i] += val;
+      return tmp;
   }
   TDynamicVector operator-(T val)
   {
+      TDynamicVector tmp(*this);
+      for (int i = 0; i < sz; i++)
+          pMem[i] -= val;
+      return tmp;
   }
   TDynamicVector operator*(T val)
   {
+      TDynamicVector tmp(*this);
+      for (int i = 0; i < sz; i++)
+          pMem[i] *= val;
+      return tmp;
   }
 
   // векторные операции
   TDynamicVector operator+(const TDynamicVector& v)
   {
+      if (sz != v.sz)
+          throw sz - v.sz;
+      TDynamicVector tmp(*this);
+      for (int i = 0; i < sz; i++) {
+         tmp.pMem[i] = pMem[i] + v.pMem[i];
+      }
+      return tmp;
   }
   TDynamicVector operator-(const TDynamicVector& v)
   {
+      if (sz != v.sz)
+          throw sz - v.sz;
+      TDynamicVector tmp(*this);
+      for (int i = 0; i < sz; i++) {
+         tmp.pMem[i] = pMem[i] - v.pMem[i];
+      }
+      return tmp;
   }
   T operator*(const TDynamicVector& v) noexcept(noexcept(T()))
   {
+      if (sz != v.sz)
+          throw sz - v.sz;
+      T res = 0;
+      for (int i = 0; i < sz; i++) {
+         res += pMem[i] * v.pMem[i];
+      }
+      return res;
   }
 
   friend void swap(TDynamicVector& lhs, TDynamicVector& rhs) noexcept
@@ -139,27 +206,60 @@ public:
   // сравнение
   bool operator==(const TDynamicMatrix& m) const noexcept
   {
+      if (sz != m.sz)
+         throw sz - m.sz;
+      for(int i = 0; i < sz; i++) {
+          if (m.pMem[i] != pMem[i])
+              return false;
+      }
+      return true;
   }
 
   // матрично-скалярные операции
   TDynamicMatrix operator*(const T& val)
   {
+      TDynamicMatrix tmp(*this);
+      for(int i = 0; i < sz; i++) 
+          tmp.pMem[i] *= val;
+      return tmp;
   }
 
   // матрично-векторные операции
   TDynamicVector<T> operator*(const TDynamicVector<T>& v)
   {
+      TDynamicMatrix tmp(*this);
+      for(int i = 0; i < sz; i++) 
+          tmp.pMem[i] *= v;
+      return tmp;
   }
 
   // матрично-матричные операции
   TDynamicMatrix operator+(const TDynamicMatrix& m)
   {
+      TDynamicMatrix tmp(*this);
+      for(int i = 0; i < sz; i++) 
+          tmp.pMem[i] += m.pMem[i];
+      return tmp;
   }
   TDynamicMatrix operator-(const TDynamicMatrix& m)
   {
+      TDynamicMatrix tmp(*this);
+      for(int i = 0; i < sz; i++) 
+          tmp.pMem[i] -= m.pMem[i];
+      return tmp
   }
   TDynamicMatrix operator*(const TDynamicMatrix& m)
   {
+      TDynamicMatrix tmp(sz);
+      for(int i = 0; i < sz; i++) {
+          for(int j = 0; j < sz; j++)  {
+              tmp.pMem[i][j] = 0;
+              for (int r = 0; r < sz; r++) {
+                  tmp.pMem[i][j] += pMem[i][r] * m.pMem[r][j];
+              }
+          }
+      }
+      return tmp
   }
 
   // ввод/вывод
