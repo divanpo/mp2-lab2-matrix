@@ -1,13 +1,38 @@
 cmake_minimum_required(VERSION 3.5)
-project(lol)
+add_definitions(-DGTEST_HAS_TR1_TUPLE=0)
 
-set(testm test_matrix)
-add_executable(${testm} samples/sample_matrix.cpp)
+set(PROJECT_NAME matrix)
+project(${PROJECT_NAME})
 
-set(Matrix tmatrix)
+# TODO(Korniakov): not sure if these lines are needed
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Configs" FORCE)
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
 
-add_library(${Matrix})
-target_link_libraries(${testm} PUBLIC ${Matrix})
-target_include_directories(tmatrix PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_sources(${Matrix} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/tmatrix.h)
-set_target_properties(tmatrix PROPERTIES LINKER_LANGUAGE CXX)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE})
+
+set(MP2_LIBRARY "${PROJECT_NAME}")
+set(MP2_TESTS   "test_${PROJECT_NAME}")
+set(MP2_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+include_directories("${MP2_INCLUDE}" gtest)
+
+# BUILD
+add_subdirectory(samples)
+add_subdirectory(gtest)
+add_subdirectory(test)
+add_subdirectory(src)
+
+# REPORT
+message( STATUS "")
+message( STATUS "General configuration for ${PROJECT_NAME}")
+message( STATUS "======================================")
+message( STATUS "")
+message( STATUS "   Configuration: ${CMAKE_BUILD_TYPE}")
+message( STATUS "")
+
+#add_executable(main test/test_main.cpp) #*
