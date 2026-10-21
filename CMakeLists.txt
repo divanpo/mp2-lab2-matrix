@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 add_definitions(-DGTEST_HAS_TR1_TUPLE=0)
 
 set(PROJECT_NAME matrix)
-project(${PROJECT_NAME})
+project(${PROJECT_NAME} CXX)
 
 # TODO(Korniakov): not sure if these lines are needed
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Configs" FORCE)
@@ -34,4 +34,10 @@ message( STATUS "")
 message( STATUS "   Configuration: ${CMAKE_BUILD_TYPE}")
 message( STATUS "")
 
-#add_executable(main test/test_main.cpp) #*
+file(GLOB hdrs "*.h*" "${MP2_INCLUDE}/*.h*")
+file(GLOB srcs "*.cpp")
+
+add_library(${MP2_LIBRARY} INTERFACE ${srcs} ${hdrs})
+target_link_libraries(${MP2_LIBRARY} INTERFACE ${LIBRARY_DEPS})
+
+

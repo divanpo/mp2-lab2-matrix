@@ -25,8 +25,10 @@ protected:
 public:
   TDynamicVector(size_t size = 1) : sz(size)
   {
-    if (sz == 0)
+    if (sz <= 0)
       throw out_of_range("Vector size should be greater than zero");
+    if (sz > MAX_VECTOR_SIZE)
+      throw out_of_range("Vector size should be lesser");
     pMem = new T[sz]();// {}; // У типа T д.б. констуктор по умолчанию
   }
   TDynamicVector(T* arr, size_t s) : sz(s)
@@ -80,6 +82,8 @@ public:
   // индексация
   T& operator[](size_t ind)
   {
+      if (ind >= sz || ind < 0)
+          throw ind;
       return pMem[ind];
   }
   const T& operator[](size_t ind) const
@@ -154,7 +158,7 @@ public:
       }
       return tmp;
   }
-  T operator*(const TDynamicVector& v) noexcept(noexcept(T()))
+  T operator*(const TDynamicVector& v) 
   {
       if (sz != v.sz)
           throw sz - v.sz;
@@ -195,8 +199,12 @@ class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>>
   using TDynamicVector<TDynamicVector<T>>::pMem;
   using TDynamicVector<TDynamicVector<T>>::sz;
 public:
+  size_t getSize() { return sz;}
   TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
   {
+    if (s <= 0 || s > MAX_MATRIX_SIZE)
+        throw s;
+    sz = s;
     for (size_t i = 0; i < sz; i++)
       pMem[i] = TDynamicVector<T>(sz);
   }
@@ -204,7 +212,7 @@ public:
   using TDynamicVector<TDynamicVector<T>>::operator[];
 
   // сравнение
-  bool operator==(const TDynamicMatrix& m) const noexcept
+  bool operator==(const TDynamicMatrix& m) const //noexcept
   {
       if (sz != m.sz)
          throw sz - m.sz;
@@ -220,7 +228,7 @@ public:
   {
       TDynamicMatrix tmp(*this);
       for(int i = 0; i < sz; i++) 
-          tmp.pMem[i] *= val;
+          tmp.pMem[i] = tmp.pMem[i] * val;
       return tmp;
   }
 
@@ -229,7 +237,7 @@ public:
   {
       TDynamicMatrix tmp(*this);
       for(int i = 0; i < sz; i++) 
-          tmp.pMem[i] *= v;
+          tmp.pMem[i] = tmp.pMem[i] * v;
       return tmp;
   }
 
@@ -245,7 +253,7 @@ public:
   {
       TDynamicMatrix tmp(*this);
       for(int i = 0; i < sz; i++) 
-          tmp.pMem[i] -= m.pMem[i];
+          tmp.pMem[i] = tmp.pMem[i] -  m.pMem[i];
       return tmp;
   }
   TDynamicMatrix operator*(const TDynamicMatrix& m)
