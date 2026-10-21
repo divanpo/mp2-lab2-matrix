@@ -246,7 +246,7 @@ public:
       TDynamicMatrix tmp(*this);
       for(int i = 0; i < sz; i++) 
           tmp.pMem[i] -= m.pMem[i];
-      return tmp
+      return tmp;
   }
   TDynamicMatrix operator*(const TDynamicMatrix& m)
   {
@@ -259,7 +259,7 @@ public:
               }
           }
       }
-      return tmp
+      return tmp;
   }
 
   // ввод/вывод
