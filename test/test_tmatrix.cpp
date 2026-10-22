@@ -41,7 +41,7 @@ TEST(TDynamicMatrix, copied_matrix_has_its_own_memory)
     }
     TDynamicMatrix<int> v(5);
     v = m;
-    m = m * 2;
+    m = m + v;
     EXPECT_FALSE(m == v);
 }
 

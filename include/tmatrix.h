@@ -99,7 +99,7 @@ public:
   }
 
   // сравнение
-  bool operator==(const TDynamicVector& v) const noexcept
+  bool operator==(const TDynamicVector& v) const //noexcept
   {
       if (sz != v.sz)
           throw sz - v.sz;

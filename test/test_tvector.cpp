@@ -120,11 +120,7 @@ TEST(TDynamicVector, compare_vector_with_itself_return_true)
 TEST(TDynamicVector, vectors_with_different_size_are_not_equal)
 {
     TDynamicVector<int> v(3);
-    for (int i = 0; i < 3; i++)
-        v[i] = i;
     TDynamicVector<int> v1(4);
-    for (int i = 0; i < 4; i++)
-        v[i] = i;
     ASSERT_ANY_THROW(v1 == v);
 }
 
